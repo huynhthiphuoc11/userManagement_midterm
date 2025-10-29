@@ -15,8 +15,6 @@ Mục tiêu chính:
    - Lưu trữ: MongoDB (local hoặc Atlas).
    - Giao thức: REST API (JSON).
 
-   ---
-
    ## 2. Kiến trúc hệ thống
 
    - Client (React Native, Expo): Hiển thị UI, gọi API, lưu JWT vào AsyncStorage.
@@ -25,8 +23,6 @@ Mục tiêu chính:
 
    Luồng cơ bản:
    - Người dùng đăng nhập → server trả JWT → client lưu token → client gọi API có auth header.
-
-   ---
 
    ## 3. Thiết lập môi trường (PowerShell — Windows)
 
