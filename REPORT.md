@@ -1,55 +1,12 @@
 # Báo cáo chi tiết - Dự án user-management-app
 
 ## Tóm tắt
-
-Báo cáo này mô tả các thay đổi đã thực hiện trên dự án `user-management-app` (frontend Expo React Native + backend Node/Express). Mục tiêu chính:
+Mục tiêu chính:
 - Hoàn thiện UI/UX cho trang quản trị (Users List, Add/Edit, Login).
 - Thêm QR code hiển thị cho từng user (dùng `react-native-qrcode-svg`).
 - Cho phép image upload và lưu URL (đã thực hiện trong các phần trước của dự án).
 - Bật Dark Mode tự động theo hệ thống (sử dụng `useColorScheme`).
-- Các tinh chỉnh: xoá nút mail-sort, bỏ pull-to-refresh mặc định, căn chỉnh nút Xóa khi swipe, cải tiến nút "Đóng" trong modal QR.
----
 
-## Danh sách thay đổi chính (tệp đã chỉnh sửa / tạo)
-
-- app/(tabs)/index.tsx
-  - Xoá button mail-sort.
-  - Bỏ pull-to-refresh control (RefreshControl) và biến `refreshing`/`onRefresh`.
-  - Cập nhật style cho action delete để nó căn giữa và đồng bộ với card khi swipe.
-  - Thêm modal QR code hiển thị bằng `react-native-qrcode-svg`.
-  - Tinh chỉnh modal Close button: căn giữa chữ "Đóng" và thu nhỏ kích thước, nâng cấp style.
-  - Áp dụng theme động (dark/light) bằng hook `useTheme()`.
-
-- app/login.tsx
-  - Đảm bảo ảnh `assets/1.png` được hiển thị.
-  - Sử dụng theme động cho background, card và inputs.
-  - Social login skeleton (Google / Facebook) bằng `expo-auth-session` (cần Client IDs để chạy đúng).
-
-- app/_layout.tsx
-  - Thêm logic để buộc điều hướng tới trang Login khi app khởi động (đã clear `user`/`token` trên mount). (Lưu ý: hiện tại hành vi này xóa session, nếu bạn muốn khác có thể thay đổi.)
-
-- utils/theme.tsx (mới)
-  - Hook `useTheme()` để trả về palette màu theo `useColorScheme()`.
-
-- declarations.d.ts (mới)
-   # BÁO CÁO HOÀN CHỈNH — ỨNG DỤNG QUẢN LÝ NGƯỜI DÙNG
-
-   Mục tiêu: Triển khai một hệ thống quản lý người dùng (User Management) cho vai trò admin, đáp ứng đầy đủ yêu cầu đề thi: CRUD người dùng, tìm kiếm, upload ảnh, QR code, đăng nhập/đăng xuất, và giao diện thân thiện.
-   ---
-
-   ## Mục lục
-   - 1. Tóm tắt & công nghệ
-   - 2. Kiến trúc hệ thống
-   - 3. Thiết lập môi trường (chi tiết, PowerShell)
-   - 4. Backend — API endpoints & mô tả
-   - 5. Frontend — cấu trúc, màn hình chính và flow
-   - 6. Hướng dẫn sử dụng (kết nối DB, đăng nhập, thêm, hiển thị, xóa, sửa, tìm kiếm, QR, đăng xuất, setting)
-   - 7. Kiểm thử & xác minh
-   - 8. Triển khai & lưu ý vận hành
-   - 9. Đánh giá chất lượng (lý do đạt 8.0 điểm)
-   - 10. Phụ lục: các lệnh thường dùng & khắc phục sự cố
-
-   ---
 
    ## 1. Tóm tắt & công nghệ
 
@@ -110,10 +67,6 @@ Báo cáo này mô tả các thay đổi đã thực hiện trên dự án `user
    npx expo start -c
    ```
 
-   Lưu ý mạng khi test trên thiết bị thật: thay baseURL trong `services/api.ts` bằng IP LAN của máy chạy backend (ví dụ: `http://192.168.1.100:5000/api`). Mở firewall/port nếu cần.
-
-   ---
-
    ## 4. Backend — API endpoints (chi tiết)
 
    Các endpoint chính (cần có để frontend hoạt động):
@@ -130,7 +83,6 @@ Báo cáo này mô tả các thay đổi đã thực hiện trên dự án `user
 
    Authentication: JWT trong header Authorization: Bearer <token>. Middleware kiểm token, trả 401 nếu expired.
 
-   ---
 
    ## 5. Frontend — cấu trúc & màn hình chính
 
@@ -143,7 +95,6 @@ Báo cáo này mô tả các thay đổi đã thực hiện trên dự án `user
 
    Giao diện hỗ trợ Dark Mode và có theme hook `utils/theme.tsx` (follow system or persisted override).
 
-   ---
 
    ## 6. HƯỚNG DẪN SỬ DỤNG CHI TIẾT (kèm ví dụ và kiểm tra)
 
@@ -190,8 +141,6 @@ Báo cáo này mô tả các thay đổi đã thực hiện trên dự án `user
    - Màn `explore.tsx` hiển thị thông tin admin (từ AsyncStorage) và cho phép sửa thông tin cá nhân.
    - Khi Save: gọi PUT `/api/users/:id` (nếu id có) và persist vào AsyncStorage.
 
-   ---
-
    ## 7. Kiểm thử & xác minh
 
    Checklist kiểm thử (manual):
@@ -213,15 +162,12 @@ Báo cáo này mô tả các thay đổi đã thực hiện trên dự án `user
    curl -X POST http://localhost:5000/api/users -H "Content-Type: application/json" -d '{"username":"test","email":"t@test.com","password":"pass"}'
    ```
 
-   ---
-
    ## 8. Triển khai & lưu ý vận hành
 
    - Khi chạy trên thiết bị thật: đảm bảo `services/api.ts` chứa `baseURL` là IP LAN của máy (ví dụ `http://192.168.1.100:5000/api`).
    - Nếu dùng Cloudinary, set biến môi trường chính xác trong backend.
    - Đóng gói release (EAS hoặc expo build) khi cần phát hành.
 
-   ---
 
    ## 9. Phụ lục — các lệnh & khắc phục sự cố thường gặp
 
@@ -253,7 +199,7 @@ Báo cáo này mô tả các thay đổi đã thực hiện trên dự án `user
 
    Lỗi react-native-svg khi chạy: cài `expo install react-native-svg` và restart Metro với cache clear `npx expo start -c`.
 
-   ---
+
 
    ## 10. Hướng dẫn thao tác (tóm tắt từng bước công việc)
 
@@ -266,7 +212,7 @@ Báo cáo này mô tả các thay đổi đã thực hiện trên dự án `user
    7) QR: bấm icon QR trên card → modal QR hiện lên → scan bằng app khác.
    8) Logout: bấm Logout → Confirm → trở về Login.
 
-   ---
+
 
    ## 11. Thông tin mã nguồn & liên hệ
 
@@ -274,7 +220,6 @@ Báo cáo này mô tả các thay đổi đã thực hiện trên dự án `user
    - Repo (backend): `backend` (Express + routes, controllers, models/User.js).
    - Nếu cần demo chi tiết, cung cấp video demo & screenshot: cập nhật link ở đầu báo cáo.
 
-   ---
   ## 13. Code chính — các chức năng cốt lõi
 
   1) services/api.ts — Axios instance và các API helpers
@@ -439,3 +384,4 @@ Báo cáo này mô tả các thay đổi đã thực hiện trên dự án `user
     finally { setLoading(false); }
   };
   ```
+
