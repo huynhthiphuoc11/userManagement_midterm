@@ -20,7 +20,7 @@ type User = {
 };
 
 export default function UserListScreen() {
-  const { colors } = useTheme();
+  const { colors, isDark, toggle } = useTheme();
   const [users, setUsers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [focused, setFocused] = useState(false);
@@ -138,12 +138,9 @@ export default function UserListScreen() {
       <View style={styles.header}>
   <Text style={[styles.title, { color: colors.text }]}>Users List</Text>
         <View style={styles.headerActions}>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-            <Ionicons name="log-out-outline" size={22} color="#ff3b30" />
+          <TouchableOpacity onPress={toggle} style={[styles.logoutBtn, {}] } accessibilityLabel={isDark ? 'Chuyển sang sáng' : 'Chuyển sang tối'}>
+            <Ionicons name={isDark ? 'sunny' : 'moon'} size={20} color={isDark ? '#FFD54F' : '#1f2937'} />
           </TouchableOpacity>
-
-          {/* sort-direction control removed per user preference */}
-
           <Link href="/add-user" asChild>
             <TouchableOpacity style={styles.addBtn}>
               <LinearGradient colors={['#A0BFFF', '#7C9EFF']} style={styles.addGradient}>

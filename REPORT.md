@@ -22,7 +22,7 @@ Lệnh & chụp ảnh minh họa:
 
 (Thêm ảnh chụp màn hình khi demo và link video lên GitHub)
 
-Link source code: <PUT_GITHUB_LINK_HERE>
+Link source code: <https://github.com/huynhthiphuoc11/userManagement_midterm.git>
 
 Link video demo: <PUT_VIDEO_LINK_HERE>
 

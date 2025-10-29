@@ -180,7 +180,7 @@ export default function LoginScreen() {
             {/* Login Button */}
             <TouchableOpacity onPress={handleLogin} disabled={loading} style={styles.loginBtnContainer}>
               <LinearGradient
-                colors={[colors.primary, '#005BDD']}
+                colors={[colors.primary ?? '#007AFF', '#005BDD']}
                 style={styles.loginBtn}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
