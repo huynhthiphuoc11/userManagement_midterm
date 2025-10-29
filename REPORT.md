@@ -1,11 +1,5 @@
 # Báo cáo chi tiết - Dự án user-management-app
 
-Ngày: 2025-10-29
-
-Người thực hiện: (bằng Copilot / tự động)
-
----
-
 ## Tóm tắt
 
 Báo cáo này mô tả các thay đổi đã thực hiện trên dự án `user-management-app` (frontend Expo React Native + backend Node/Express). Mục tiêu chính:
@@ -14,14 +8,9 @@ Báo cáo này mô tả các thay đổi đã thực hiện trên dự án `user
 - Cho phép image upload và lưu URL (đã thực hiện trong các phần trước của dự án).
 - Bật Dark Mode tự động theo hệ thống (sử dụng `useColorScheme`).
 - Các tinh chỉnh: xoá nút mail-sort, bỏ pull-to-refresh mặc định, căn chỉnh nút Xóa khi swipe, cải tiến nút "Đóng" trong modal QR.
-
-Trong phần báo cáo này tôi liệt kê các tệp đã sửa, các lệnh đã chạy, cách kiểm tra chức năng, ảnh minh hoạ (placeholders) và các bước tiếp theo gợi ý.
-
 ---
 
 ## Danh sách thay đổi chính (tệp đã chỉnh sửa / tạo)
-
-(Những tệp quan trọng nhất đã chỉnh sửa trong workspace `d:\DNT\test1\user-management-app`)
 
 - app/(tabs)/index.tsx
   - Xoá button mail-sort.
@@ -45,12 +34,7 @@ Trong phần báo cáo này tôi liệt kê các tệp đã sửa, các lệnh �
 - declarations.d.ts (mới)
    # BÁO CÁO HOÀN CHỈNH — ỨNG DỤNG QUẢN LÝ NGƯỜI DÙNG
 
-   Phiên bản: Đề thi giữa kỳ — React Native (Expo) + Node.js + MongoDB
-
    Mục tiêu: Triển khai một hệ thống quản lý người dùng (User Management) cho vai trò admin, đáp ứng đầy đủ yêu cầu đề thi: CRUD người dùng, tìm kiếm, upload ảnh, QR code, đăng nhập/đăng xuất, và giao diện thân thiện.
-
-   Lưu ý quan trọng: Trong suốt dự án chỉ sử dụng 4 trường dữ liệu cho mô hình User: `username`, `email`, `password`, `image`. Không thêm trường mới.
-
    ---
 
    ## Mục lục
@@ -239,21 +223,7 @@ Trong phần báo cáo này tôi liệt kê các tệp đã sửa, các lệnh �
 
    ---
 
-   ## 9. Đánh giá chất lượng — lý do đạt 8.0 điểm
-
-   Ứng dụng đạt 8.0 dựa trên các tiêu chí sau:
-
-   - Yêu cầu chức năng: đầy đủ CRUD, đăng nhập/đăng xuất, tìm kiếm, upload ảnh, QR code, edit profile — 40%.
-   - Giao diện & UX: bố cục rõ ràng, responsive, hỗ trợ Dark Mode, card/gradient/button hiện đại — 20%.
-   - Kỹ thuật: JWT auth, axios interceptor, AsyncStorage, Cloudinary integration (upload), error handling cơ bản — 20%.
-   - Tài liệu & reproducibility: có README/GUIDE/REPORT với hướng dẫn chi tiết để chạy và debug — 10%.
-   - Tối ưu & an toàn: password băm (bcrypt), token verification, basic error messages — 10%.
-
-   Ghi chú: Điểm có thể nâng cao bằng cách bổ sung unit/integration tests, hardening auth (refresh token), và CI/CD.
-
-   ---
-
-   ## 10. Phụ lục — các lệnh & khắc phục sự cố thường gặp
+   ## 9. Phụ lục — các lệnh & khắc phục sự cố thường gặp
 
    Chạy frontend:
 
@@ -285,7 +255,7 @@ Trong phần báo cáo này tôi liệt kê các tệp đã sửa, các lệnh �
 
    ---
 
-   ## 11. Hướng dẫn thao tác (tóm tắt từng bước công việc)
+   ## 10. Hướng dẫn thao tác (tóm tắt từng bước công việc)
 
    1) Tạo admin (nếu chưa có): POST `/api/users` hoặc seed DB.
    2) Mở app → Login với admin → vào tab Users.
@@ -298,25 +268,14 @@ Trong phần báo cáo này tôi liệt kê các tệp đã sửa, các lệnh �
 
    ---
 
-   ## 12. Thông tin mã nguồn & liên hệ
+   ## 11. Thông tin mã nguồn & liên hệ
 
    - Repo (frontend): `user-management-app` (thư mục `app/`) — chứa các màn hình chính: `login.tsx`, `(tabs)/index.tsx`, `add-user.tsx`, `edit-user.tsx`, `(tabs)/explore.tsx`.
    - Repo (backend): `backend` (Express + routes, controllers, models/User.js).
    - Nếu cần demo chi tiết, cung cấp video demo & screenshot: cập nhật link ở đầu báo cáo.
 
    ---
-
-   ## KẾT LUẬN
-
-   Ứng dụng đáp ứng đầy đủ yêu cầu đề thi: CRUD, tìm kiếm, upload ảnh, QR code, auth, dark mode và tài liệu hướng dẫn chạy chi tiết. Báo cáo này cung cấp hướng dẫn chạy, mô tả kiến trúc và các bước kiểm thử để bạn (giám khảo hoặc người phát triển khác) dễ dàng dựng lại và đánh giá.
-
-   Chúc bạn đạt kết quả cao với đồ án này! Nếu cần, tôi có thể bổ sung: Postman collection, video demo, hoặc scripts seed DB.
- 
-  ---
-
-  ## 13. Code chính (snippets) — các chức năng cốt lõi
-
-  Dưới đây là các đoạn code chính, có thể copy-paste vào dự án để tham khảo hoặc kiểm tra. Mỗi đoạn kèm chú giải ngắn.
+  ## 13. Code chính — các chức năng cốt lõi
 
   1) services/api.ts — Axios instance và các API helpers
 
@@ -480,12 +439,3 @@ Trong phần báo cáo này tôi liệt kê các tệp đã sửa, các lệnh �
     finally { setLoading(false); }
   };
   ```
-
-  ---
-
-  Nếu bạn muốn, tôi có thể:
-  - Chèn các file code full vào repo (tạo thư mục `snippets/` và lưu mỗi file), hoặc
-  - Tạo PR chứa các file mẫu (login handler, services/api.ts, AddEditUserForm, explore.tsx), hoặc
-  - Xuất thành tài liệu PDF/Markdown riêng để gửi cho giảng viên.
-
-  Cho tôi biết bạn muốn tiếp theo: thêm file snippets vào repo, tạo PR, hay xuất tài liệu?
