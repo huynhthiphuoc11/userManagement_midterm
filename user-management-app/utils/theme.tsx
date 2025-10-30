@@ -31,7 +31,7 @@ const light: ThemeColors = {
 const dark: ThemeColors = {
   background: '#0B1220',
   surface: '#0F1724',
-  card: '#0B1220',
+  card: '#121213ff',
   text: '#F8FAFC',
   subtext: '#9CA3AF',
   border: '#162029',

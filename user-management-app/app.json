@@ -38,11 +38,16 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "GOOGLE_CLIENT_ID": "YOUR_GOOGLE_CLIENT_ID",
+      "FACEBOOK_APP_ID": "YOUR_FACEBOOK_APP_ID"
     }
   }
 }

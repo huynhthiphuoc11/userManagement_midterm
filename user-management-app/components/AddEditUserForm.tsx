@@ -11,6 +11,8 @@ import {
   Pressable,
   Platform,
   Dimensions,
+  Animated,
+  Easing,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -18,19 +20,23 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import useTheme from '../utils/theme';
 import { updateUser, fetchUserById } from '../services/api';
 
 export default function AddEditUserForm() {
   const { id } = useLocalSearchParams();
   const isEdit = !!id;
   const router = useRouter();
+  const { colors } = useTheme();
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ username?: string; email?: string; password?: string }>({});
 
   const { width: winW, height: winH } = Dimensions.get('window');
   const insets = useSafeAreaInsets();
@@ -127,15 +133,63 @@ export default function AddEditUserForm() {
     ]);
   };
 
+  // Validation helpers
+  const emailIsValid = (e: string) => /\S+@\S+\.\S+/.test(e);
+
+  // Animated error text component to reserve space and animate appearance
+  const ErrorText: React.FC<{ message?: string | null }> = ({ message }) => {
+    const anim = React.useRef(new Animated.Value(message ? 1 : 0)).current;
+
+    useEffect(() => {
+      Animated.timing(anim, {
+        toValue: message ? 1 : 0,
+        duration: 180,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: false,
+      }).start();
+    }, [message, anim]);
+
+    const height = anim.interpolate({ inputRange: [0, 1], outputRange: [0, 20] });
+    const opacity = anim;
+
+    return (
+      <Animated.View style={{ height, overflow: 'hidden' }}>
+        <Animated.Text style={[styles.errorText, { opacity }]}>{message || ''}</Animated.Text>
+      </Animated.View>
+    );
+  };
+
+  const validateField = (field: 'username' | 'email' | 'password', value: string) => {
+    let msg = '';
+    if (field === 'username') {
+      if (!value || value.trim().length < 3) msg = 'Tên phải có ít nhất 3 ký tự';
+    }
+    if (field === 'email') {
+      if (!value) msg = 'Email là bắt buộc';
+      else if (!emailIsValid(value)) msg = 'Email không hợp lệ';
+    }
+    if (field === 'password') {
+      if (!isEdit && (!value || value.length < 6)) msg = 'Mật khẩu phải có ít nhất 6 ký tự';
+      if (isEdit && value && value.length > 0 && value.length < 6) msg = 'Mật khẩu phải có ít nhất 6 ký tự';
+    }
+    setErrors((p) => ({ ...p, [field]: msg }));
+    return msg === '';
+  };
+
+  const validateAll = () => {
+    const ok1 = validateField('username', username);
+    const ok2 = validateField('email', email);
+    const ok3 = validateField('password', password);
+    return ok1 && ok2 && ok3;
+  };
+
   const handleSubmit = async () => {
-    if (!username || !email || (!isEdit && !password)) {
-      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin');
+    if (!validateAll()) {
+      Alert.alert('Lỗi', 'Vui lòng sửa các trường còn lỗi');
       return;
     }
-
     setLoading(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-
     try {
 
       if (isEdit) {
@@ -169,14 +223,12 @@ export default function AddEditUserForm() {
             type: 'image/jpeg',
           } as any);
         }
-
         const res = await fetch(`${API_BASE}/uploads/user-with-image`, {
           method: 'POST',
           body: formData,
         });
         if (!res.ok) throw new Error('Tạo người dùng thất bại');
       }
-
       Alert.alert('Thành công', isEdit ? 'Cập nhật thành công!' : 'Tạo thành công!', [
         { text: 'OK', onPress: () => router.back() },
       ]);
@@ -219,7 +271,7 @@ export default function AddEditUserForm() {
       </Pressable>
 
       <View style={styles.form}>
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, { backgroundColor: colors.surface, borderColor: focusedInput === 'username' ? '#007AFF' : (errors.username ? '#FF3B30' : colors.border) }]}>
           <Ionicons
             name="person-outline"
             size={20}
@@ -234,14 +286,15 @@ export default function AddEditUserForm() {
             ]}
             placeholder="Tên người dùng"
             value={username}
-            onChangeText={setUsername}
+            onChangeText={(v) => { setUsername(v); if (errors.username) validateField('username', v); }}
             onFocus={() => setFocusedInput('username')}
-            onBlur={() => setFocusedInput(null)}
+            onBlur={() => { setFocusedInput(null); validateField('username', username); }}
             autoCapitalize="none"
           />
         </View>
+  <ErrorText message={errors.username} />
 
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, { backgroundColor: colors.surface, borderColor: focusedInput === 'email' ? '#007AFF' : (errors.email ? '#FF3B30' : colors.border) }]}>
           <Ionicons
             name="mail-outline"
             size={20}
@@ -256,36 +309,43 @@ export default function AddEditUserForm() {
             ]}
             placeholder="email@example.com"
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(v) => { setEmail(v); if (errors.email) validateField('email', v); }}
             onFocus={() => setFocusedInput('email')}
-            onBlur={() => setFocusedInput(null)}
+            onBlur={() => { setFocusedInput(null); validateField('email', email); }}
             keyboardType="email-address"
             autoCapitalize="none"
           />
         </View>
+  <ErrorText message={errors.email} />
 
         {!isEdit && (
-          <View style={styles.inputContainer}>
-            <Ionicons
-              name="lock-closed-outline"
-              size={20}
-              color={focusedInput === 'password' ? '#007AFF' : '#aaa'}
-              style={styles.inputIcon}
-            />
-            <TextInput
-              style={[
-                styles.input,
-                { paddingVertical: INPUT_PADDING_VERTICAL },
-                focusedInput === 'password' && styles.inputFocused,
-              ]}
-              placeholder="Mật khẩu"
-              value={password}
-              onChangeText={setPassword}
-              onFocus={() => setFocusedInput('password')}
-              onBlur={() => setFocusedInput(null)}
-              secureTextEntry
-            />
-          </View>
+          <>
+            <View style={[styles.inputContainer, { backgroundColor: colors.surface, borderColor: focusedInput === 'password' ? '#007AFF' : (errors.password ? '#FF3B30' : '#E2E8F0') }]}>
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color={focusedInput === 'password' ? '#007AFF' : '#aaa'}
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={[
+                  styles.input,
+                  { paddingVertical: INPUT_PADDING_VERTICAL },
+                  focusedInput === 'password' && styles.inputFocused,
+                ]}
+                placeholder="Mật khẩu"
+                value={password}
+                onChangeText={(v) => { setPassword(v); if (errors.password) validateField('password', v); }}
+                onFocus={() => setFocusedInput('password')}
+                onBlur={() => { setFocusedInput(null); validateField('password', password); }}
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{ padding: 8 }}>
+                <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color={focusedInput === 'password' ? '#007AFF' : '#9CA3AF'} />
+              </TouchableOpacity>
+            </View>
+            <ErrorText message={errors.password} />
+          </>
         )}
       </View>
 
@@ -445,5 +505,11 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+  errorText: {
+    color: '#FF3B30',
+    marginTop: 0,
+    fontSize: 13,
+    lineHeight: 18,
   },
 });

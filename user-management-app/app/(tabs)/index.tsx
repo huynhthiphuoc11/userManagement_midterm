@@ -1,15 +1,12 @@
 import { View, Text, FlatList, Image, TouchableOpacity, Alert, StyleSheet, TextInput, useColorScheme, Modal } from 'react-native';
 import { useState, useCallback, useMemo, useRef } from 'react';
-import { Link, useRouter, useFocusEffect } from 'expo-router';
+import { useRouter, useFocusEffect, Link } from 'expo-router';
 import { Swipeable, RectButton } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchUsers, deleteUser } from '../../services/api';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import useTheme from '../../utils/theme';
-// QR code renderer
-// note: ensure `react-native-qrcode-svg` (and `react-native-svg`) are installed
-// e.g. `expo install react-native-svg` (if using Expo) and `npm install react-native-qrcode-svg`
 import QRCode from 'react-native-qrcode-svg';
 
 type User = {
@@ -141,6 +138,16 @@ export default function UserListScreen() {
           <TouchableOpacity onPress={toggle} style={[styles.logoutBtn, {}] } accessibilityLabel={isDark ? 'Chuyển sang sáng' : 'Chuyển sang tối'}>
             <Ionicons name={isDark ? 'sunny' : 'moon'} size={20} color={isDark ? '#FFD54F' : '#1f2937'} />
           </TouchableOpacity>
+          {/* Dashboard link */}
+          <TouchableOpacity
+            style={[styles.addBtn, { }]}
+            accessibilityLabel="Open dashboard"
+            onPress={() => router.push('/dashboard' as any)}
+          >
+            <LinearGradient colors={['#FFD27A', '#FF9E5A']} style={styles.addGradient}>
+              <Ionicons name="bar-chart" size={20} color="white" />
+            </LinearGradient>
+          </TouchableOpacity>
           <Link href="/add-user" asChild>
             <TouchableOpacity style={styles.addBtn}>
               <LinearGradient colors={['#A0BFFF', '#7C9EFF']} style={styles.addGradient}>
@@ -193,25 +200,34 @@ export default function UserListScreen() {
               </RectButton>
             )}
           >
-            <View style={[styles.userCard, { backgroundColor: colors.card, borderColor: colors.border }] }>
-              <Image
-                source={{ uri: getImageUri(item.image) }}
-                style={styles.avatar}
-                defaultSource={{ uri: 'https://via.placeholder.com/150/eeeeee/999999?text=?' }}
-              />
-              <View style={styles.userInfo}>
-                <Text style={[styles.username, { color: colors.text }]}>{item.username}</Text>
-                <Text style={[styles.email, { color: colors.subtext }]}>{item.email || 'Chưa có email'}</Text>
+            <View style={[styles.userCard, { backgroundColor: colors.card }] }>
+              <View style={styles.userTopRow}>
+                <Image
+                  source={{ uri: getImageUri(item.image) }}
+                  style={styles.avatar}
+                  defaultSource={{ uri: 'https://via.placeholder.com/150/eeeeee/999999?text=?' }}
+                />
+                <View style={styles.userInfo}>
+                  <Text style={[styles.username, { color: colors.text }]}>{item.username}</Text>
+                  <Text style={[styles.email, { color: colors.subtext }]}>{item.email || 'Chưa có email'}</Text>
+                </View>
               </View>
-              <View style={styles.actions}>
+
+              <View style={styles.actionRow}>
                 <TouchableOpacity
                   onPress={() => router.push(`/edit-user?id=${item._id}` as any)}
-                  style={styles.actionBtn}
+                  style={[styles.actionButton, { borderColor: colors.border }]}
                 >
-                  <Ionicons name="create-outline" size={22} color="#007AFF" />
+                  <Ionicons name="create-outline" size={18} color="#007AFF" style={{ marginRight: 8 }} />
+                  <Text style={[styles.actionButtonText, { color: colors.text }]}>Chỉnh sửa</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => openQr(item)} style={styles.actionBtn}>
-                  <Ionicons name="qr-code-outline" size={22} color="#444" />
+
+                <TouchableOpacity
+                  onPress={() => openQr(item)}
+                  style={[styles.actionButton, { borderColor: colors.border }]}
+                >
+                  <Ionicons name="qr-code-outline" size={18} color="#444" style={{ marginRight: 8 }} />
+                  <Text style={[styles.actionButtonText, { color: colors.text }]}>QR</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -260,6 +276,7 @@ export default function UserListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    borderRadius: 12,
   },
   header: {
     flexDirection: 'row',
@@ -352,10 +369,11 @@ const styles = StyleSheet.create({
   list: {
     paddingHorizontal: 18,
     paddingBottom: 20,
+    borderRadius: 16,
   },
   userCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
     backgroundColor: '#fff',
     padding: 16,
     borderRadius: 14,
@@ -365,18 +383,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 6,
+    borderWidth: 1,
+    borderColor: '#CFE8FF',
   },
   avatar: {
-    width: 58,
-    height: 58,
+    width: 60,
+    height: 60,
     borderRadius: 29,
     backgroundColor: '#f0f0f0',
     borderWidth: 2,
     borderColor: '#fff',
+    marginRight: 12,
   },
   userInfo: {
     flex: 1,
-    marginLeft: 14,
+    marginLeft: 12,
+    minWidth: 0,
   },
   username: {
     fontSize: 16.5,
@@ -401,6 +423,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
     borderWidth: 1.5,
     borderColor: '#e8e8e8',
+  },
+  userTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 8,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+    width: '100%',
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    width: '48%',
+    justifyContent: 'center',
+  },
+  actionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 
   deleteAction: {

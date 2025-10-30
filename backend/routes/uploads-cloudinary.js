@@ -8,16 +8,13 @@ const User = require('../models/User');
 const storage = multer.memoryStorage();
 const upload = multer({ storage, limits: { fileSize: 8 * 1024 * 1024 } }); // 8MB
 
-// Helper to upload buffer to Cloudinary via data URI
+
 async function uploadBufferToCloudinary(buffer, mimetype, folder = 'user_images') {
   const base64 = buffer.toString('base64');
   const dataUri = `data:${mimetype};base64,${base64}`;
-  // upload returns a promise if callback omitted
+
   return cloudinary.uploader.upload(dataUri, { folder, resource_type: 'image' });
 }
-
-// Create user with image uploaded to Cloudinary
-// Expect multipart/form-data with fields: username, email, password and single file field 'image'
 router.post('/user-with-image', upload.single('image'), async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -29,7 +26,7 @@ router.post('/user-with-image', upload.single('image'), async (req, res) => {
       imageUrl = result.secure_url || result.url || '';
     }
 
-    const bcrypt = require('bcrypt');
+  const bcrypt = require('bcryptjs');
     const hashed = await bcrypt.hash(password, 10);
 
     const existing = await User.findOne({ email });
